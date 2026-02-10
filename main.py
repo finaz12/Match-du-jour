@@ -2,12 +2,20 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+import webbrowser
+import requests
 
-# ---------- FONCTION POUR LIRE LES FICHIERS TXT ----------
+# ---------- LIENS GITHUB (RAW) ----------
+BASE_URL = "https://raw.githubusercontent.com/finaz12/Match-du-jour/main/"
+
 def lire_fichier(nom):
     try:
-        with open(nom, "r", encoding="utf-8") as f:
-            return f.read()
+        url = BASE_URL + nom
+        r = requests.get(url, timeout=5)
+        if r.status_code == 200:
+            return r.text
+        else:
+            return "Aucun match disponible"
     except:
         return "Aucun match disponible"
 
@@ -24,26 +32,10 @@ def ouvrir_safe(instance):
 def ouvrir_simple(instance):
     app.label.text = lire_fichier("simple.txt")
 
-# ✅ WHATSAPP ANDROID (CORRIGÉ)
 def ouvrir_vip(instance):
-    try:
-        from jnius import autoclass
-
-        Intent = autoclass('android.content.Intent')
-        Uri = autoclass('android.net.Uri')
-        PythonActivity = autoclass('org.kivy.android.PythonActivity')
-
-        numero = "261345704202"
-        message = "Bonjour, je veux activer le VIP Réaliste"
-        url = f"https://wa.me/{numero}?text={Uri.encode(message)}"
-
-        intent = Intent(Intent.ACTION_VIEW)
-        intent.setData(Uri.parse(url))
-        currentActivity = PythonActivity.mActivity
-        currentActivity.startActivity(intent)
-
-    except Exception as e:
-        print("Erreur WhatsApp :", e)
+    webbrowser.open(
+        "https://wa.me/261345704202?text=Bonjour%2C%20je%20veux%20activer%20le%20VIP%20Réaliste"
+    )
 
 # ---------- APPLICATION ----------
 class RealisteVIP(App):
@@ -90,6 +82,5 @@ class RealisteVIP(App):
 
         return layout
 
-# ---------- LANCEMENT ----------
 if __name__ == "__main__":
     RealisteVIP().run()
