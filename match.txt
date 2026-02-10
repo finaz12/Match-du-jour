@@ -1,5 +1,0 @@
-Match 1 : Real Madrid vs Barca (1)
-Match 2 : PSG vs Marseille (GG)
-Match 3 : Man City vs Arsenal (2.5)
-Match 4 : Juventus vs Milan (1.5)
-Match 5 : Bayern vs Dortmund (2)
