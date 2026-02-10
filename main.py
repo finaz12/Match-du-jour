@@ -2,23 +2,33 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
-from kivy.uix.scrollview import ScrollView
-from kivy.graphics import Color, Rectangle
 
-
-# ====== FONCTION LECTURE FICHIERS TXT ======
+# ---------- FONCTION POUR LIRE LES FICHIERS TXT ----------
 def lire_fichier(nom):
     try:
         with open(nom, "r", encoding="utf-8") as f:
             return f.read()
     except:
-        return "Contenu indisponible"
+        return "Aucun match disponible"
 
+# ---------- FONCTIONS BOUTONS ----------
+def ouvrir_coupon(instance):
+    app.label.text = lire_fichier("coupon.txt")
 
-# ====== FONCTION WHATSAPP VIP (ANDROID) ======
+def ouvrir_fun(instance):
+    app.label.text = lire_fichier("fun.txt")
+
+def ouvrir_safe(instance):
+    app.label.text = lire_fichier("safe.txt")
+
+def ouvrir_simple(instance):
+    app.label.text = lire_fichier("simple.txt")
+
+# ✅ WHATSAPP ANDROID (CORRIGÉ)
 def ouvrir_vip(instance):
     try:
         from jnius import autoclass
+
         Intent = autoclass('android.content.Intent')
         Uri = autoclass('android.net.Uri')
         PythonActivity = autoclass('org.kivy.android.PythonActivity')
@@ -35,83 +45,51 @@ def ouvrir_vip(instance):
     except Exception as e:
         print("Erreur WhatsApp :", e)
 
-
-# ====== CLASSE PRINCIPALE ======
-class MatchDuJour(App):
-
+# ---------- APPLICATION ----------
+class RealisteVIP(App):
     def build(self):
-        root = BoxLayout(orientation="vertical", padding=10, spacing=10)
+        global app
+        app = self
 
-        # FOND VERT
-        with root.canvas.before:
-            Color(0, 0.6, 0, 1)
-            self.rect = Rectangle(size=root.size, pos=root.pos)
-        root.bind(size=self._update_rect, pos=self._update_rect)
+        layout = BoxLayout(orientation="vertical", padding=10, spacing=10)
 
-        # TITRE
         titre = Label(
-            text="🔥 MATCHS GRATUITS DU JOUR 🔥",
-            size_hint=(1, None),
-            height=60,
+            text="RÉALISTE VIP ⚽",
+            size_hint=(1, 0.15),
+            font_size="24sp",
             bold=True
         )
-        root.add_widget(titre)
 
-        # ZONE TEXTE
-        self.texte = Label(
-            text=lire_fichier("coupon.txt"),
-            size_hint_y=None,
-            valign="top"
+        self.label = Label(
+            text="MATCHS GRATUITS DU JOUR\n\nChoisis un bouton",
+            size_hint=(1, 0.45),
+            halign="center",
+            valign="middle"
         )
-        self.texte.bind(texture_size=self._update_text_height)
+        self.label.bind(size=self.label.setter("text_size"))
 
-        scroll = ScrollView()
-        scroll.add_widget(self.texte)
-        root.add_widget(scroll)
+        btn_coupon = Button(text="🎟 Coupon du jour", on_press=ouvrir_coupon)
+        btn_fun = Button(text="🔥 Fun (20+)", on_press=ouvrir_fun)
+        btn_safe = Button(text="🛡 Safe", on_press=ouvrir_safe)
+        btn_simple = Button(text="⚽ Simple", on_press=ouvrir_simple)
 
-        # BOUTONS
-        root.add_widget(self.bouton("📌 Coupon du jour", "coupon.txt"))
-        root.add_widget(self.bouton("🎉 Fun (20+)", "fun.txt"))
-        root.add_widget(self.bouton("🛡 Safe", "safe.txt"))
-        root.add_widget(self.bouton("⚽ Simple", "simple.txt"))
-
-        # BOUTON VIP VERROUILLÉ
-        vip = Button(
-            text="🔒 VIP Réaliste",
-            size_hint=(1, None),
-            height=80,
-            background_color=(0.4, 0.3, 0, 1)
+        btn_vip = Button(
+            text="VIP 🔒",
+            size_hint=(1, 0.15),
+            background_color=(0, 0.8, 0, 1)
         )
-        vip.bind(on_press=ouvrir_vip)
-        root.add_widget(vip)
+        btn_vip.bind(on_press=ouvrir_vip)
 
-        return root
+        layout.add_widget(titre)
+        layout.add_widget(self.label)
+        layout.add_widget(btn_coupon)
+        layout.add_widget(btn_fun)
+        layout.add_widget(btn_safe)
+        layout.add_widget(btn_simple)
+        layout.add_widget(btn_vip)
 
-    # ====== BOUTON STANDARD ======
-    def bouton(self, texte, fichier):
-        btn = Button(
-            text=texte,
-            size_hint=(1, None),
-            height=70,
-            background_color=(0.3, 0.3, 0.3, 1)
-        )
-        btn.bind(on_press=lambda x: self.afficher(fichier))
-        return btn
+        return layout
 
-    # ====== AFFICHER CONTENU ======
-    def afficher(self, fichier):
-        self.texte.text = lire_fichier(fichier)
-
-    # ====== AJUSTEMENTS ======
-    def _update_rect(self, instance, value):
-        self.rect.size = instance.size
-        self.rect.pos = instance.pos
-
-    def _update_text_height(self, instance, value):
-        instance.height = instance.texture_size[1]
-        instance.text_size = (instance.width, None)
-
-
-# ====== LANCEMENT ======
+# ---------- LANCEMENT ----------
 if __name__ == "__main__":
-    MatchDuJour().run()
+    RealisteVIP().run()
