@@ -2,50 +2,80 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
-from kivy.core.window import Window
+import webbrowser
 import os
 
-Window.clearcolor = (0, 0.6, 0, 1)  # fond vert
+# ---------- FONCTION POUR LIRE LES FICHIERS TXT ----------
+def lire_fichier(nom):
+    try:
+        with open(nom, "r", encoding="utf-8") as f:
+            return f.read()
+    except:
+        return "Aucun match disponible"
 
-class MatchApp(App):
+# ---------- FONCTIONS BOUTONS ----------
+def ouvrir_coupon(instance):
+    app.label.text = lire_fichier("coupon.txt")
+
+def ouvrir_fun(instance):
+    app.label.text = lire_fichier("fun.txt")
+
+def ouvrir_safe(instance):
+    app.label.text = lire_fichier("safe.txt")
+
+def ouvrir_simple(instance):
+    app.label.text = lire_fichier("simple.txt")
+
+def ouvrir_vip(instance):
+    webbrowser.open(
+        "https://wa.me/261345704202?text=Bonjour%2C%20je%20veux%20activer%20le%20VIP%20Réaliste"
+    )
+
+# ---------- APPLICATION ----------
+class RealisteVIP(App):
     def build(self):
-        self.layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+        global app
+        app = self
+
+        layout = BoxLayout(orientation="vertical", padding=10, spacing=10)
+
+        titre = Label(
+            text="RÉALISTE VIP ⚽",
+            size_hint=(1, 0.15),
+            font_size="24sp",
+            bold=True
+        )
 
         self.label = Label(
-            text="Choisis un bouton",
-            size_hint=(1, 0.3),
-            color=(1, 1, 1, 1),
+            text="MATCHS GRATUITS DU JOUR\n\nChoisis un bouton",
+            size_hint=(1, 0.45),
             halign="center",
             valign="middle"
         )
         self.label.bind(size=self.label.setter("text_size"))
 
-        self.layout.add_widget(self.label)
+        btn_coupon = Button(text="🎟 Coupon du jour", on_press=ouvrir_coupon)
+        btn_fun = Button(text="🔥 Fun (20+)", on_press=ouvrir_fun)
+        btn_safe = Button(text="🛡 Safe", on_press=ouvrir_safe)
+        btn_simple = Button(text="⚽ Simple", on_press=ouvrir_simple)
 
-        self.add_btn("Coupon du jour", "coupon.txt")
-        self.add_btn("Le Fun (20+)", "fun.txt")
-        self.add_btn("Le Safe", "safe.txt")
-        self.add_btn("Simple", "simple.txt")
-        self.add_btn("VIP 🔒", "vip.txt")
-
-        return self.layout
-
-    def add_btn(self, text, file):
-        btn = Button(
-            text=text,
+        btn_vip = Button(
+            text="VIP 🔒",
             size_hint=(1, 0.15),
-            background_color=(0.3, 0.3, 0.3, 1),
-            color=(1, 1, 1, 1)
+            background_color=(0, 0.8, 0, 1)
         )
-        btn.bind(on_press=lambda x: self.load_match(file))
-        self.layout.add_widget(btn)
+        btn_vip.bind(on_press=ouvrir_vip)
 
-    def load_match(self, file):
-        if os.path.exists(file):
-            with open(file, "r", encoding="utf-8") as f:
-                self.label.text = f.read()
-        else:
-            self.label.text = "Fichier introuvable"
+        layout.add_widget(titre)
+        layout.add_widget(self.label)
+        layout.add_widget(btn_coupon)
+        layout.add_widget(btn_fun)
+        layout.add_widget(btn_safe)
+        layout.add_widget(btn_simple)
+        layout.add_widget(btn_vip)
 
+        return layout
+
+# ---------- LANCEMENT ----------
 if __name__ == "__main__":
-    MatchApp().run()
+    RealisteVIP().run()
